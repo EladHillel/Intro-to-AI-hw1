@@ -178,6 +178,8 @@ class DragonBallEnv(Env):
         Sets the current state of the agent.
         """
         self.s = state
+        #### CODE I ADDEDDD ######
+        self.collected_dragon_balls[0], self.collected_dragon_balls[1] = state[1], state[2]
 
     def get_state(self):
         """
