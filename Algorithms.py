@@ -30,6 +30,7 @@ class BFSAgent():
             self.expanded += 1
             self.closed.add(currentState)
             for action, successor in env.succ(currentState).items():
+                env.reset()
                 env.set_state(currentState)
                 childState = env.step(action)[0]
                 if env.is_final_state(childState):
@@ -52,6 +53,7 @@ class BFSAgent():
     def calculate_cost(self, actions: list[int]) -> int:
         # set initial and than walk by the actions
         state = env.get_initial_state()
+        env.reset()
         env.set_state(state)
         cost = 0
         index = 0
