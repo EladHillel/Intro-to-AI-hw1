@@ -26,7 +26,7 @@ class BFSAgent():
         env.reset()
         startState = env.get_state()
         self.open.append(startState)
-        self.nodes[startState] = Node(startState, None, None)
+        self.nodes[startState] = Node(startState, None, None, 0)
         while len(self.open):
             currentState = self.open.popleft()
             self.expanded += 1
