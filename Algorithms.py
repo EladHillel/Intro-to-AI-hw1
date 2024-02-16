@@ -82,14 +82,24 @@ class WeightedAStarAgent():
             finalState = self.nodes[finalState].papa
         actions.reverse()
         return actions
+
+    def initHeuristicCalc(self, env):
+        positionsForHueristic = {state[0] for state in env.goals}
+        positionsForHueristic.add(env.d1[0])
+        positionsForHueristic.add(env.d2[0])
+        self.pointsForHeuristic = {(position / 8, position % 8) for position in positionsForHueristic}
     def calc_heuristic(self, state):
-        pass
+        point = (state[0] / 8, state[0] % 8)
+        distances = {abs(point[0] - otherPoint[0]) + abs(point[1] - otherPoint[1]) for otherPoint in self.pointsForHeuristic }
+        return min(distances)
+
     def calc_fval(self, hVal, gVal):
         return self.weight * hVal + (1-self.weight) * gVal
 
 
     def search(self, env: DragonBallEnv, h_weight) -> Tuple[List[int], float, int]:
         self.weight = h_weight
+        self.initHeuristicCalc(env)
         env.reset()
         startState = env.get_state()
         startHVal = self.calc_heuristic(startState)
@@ -110,25 +120,27 @@ class WeightedAStarAgent():
                 env.set_state(currentState)
                 childState, cost, terminated = env.step(action)
 
-                if (terminated and not env.is_final_state(childState)):
+                if terminated and not env.is_final_state(childState):
                     continue
 
                 newGVal = currentNode.totalCost + cost
                 childHVal = self.calc_heuristic(childState)
                 newFVal = self.calc_fval(childHVal, newGVal)
+                newChildNode = Node(childState, currentState, action, newGVal)
                 if (childState not in self.open) and (childState not in self.closed):
-                    self.open[childState] = (newFVal, childState, Node(childState, currentState, action, newGVal))
+                    self.open[childState] = (newFVal, childState, newChildNode)
+                    self.nodes[childState] = newChildNode
                 elif childState in self.open :
                     childExistingFVal, childState, childExistingNode = self.open[childState]
                     if newFVal < childExistingFVal:
-                        newChildNode = Node(childState, currentState, action, newGVal)
+                        self.nodes[childState] = newChildNode
                         self.open[childState] = (newFVal,childState, newChildNode)
                 else:
                     childExistingNode = self.nodes[childState]
                     childExistingFVal = self.calc_fval(childHVal, childExistingNode.totalCost)
                     if newFVal < childExistingFVal:
-                        newChildNode = Node(childState, currentState, action, newGVal)
                         self.open[childState] = (newFVal,childState, newChildNode)
+                        self.nodes[childState] = newChildNode
                         self.closed.remove(childState)
         return None
 
