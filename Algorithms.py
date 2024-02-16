@@ -93,7 +93,7 @@ class WeightedAStarAgent():
         env.reset()
         startState = env.get_state()
         startHVal = self.calc_heuristic(startState)
-        startNode = Node(startState, None, None);
+        startNode = Node(startState, None, None, 0);
         self.open[startState] = (self.calc_fval(startHVal, 0), startState,  startNode) #secondary comparision by state as required
         self.nodes[startState] = startNode
 
@@ -168,7 +168,7 @@ def search(self, env: DragonBallEnv, epsilon: int) -> Tuple[List[int], float, in
         env.reset()
         startState = env.get_state()
         startHVal = self.calc_heuristic(startState)
-        startNode = Node(startState, None, None);
+        startNode = Node(startState, None, None, 0);
         self.open[startState] = (
         self.calc_fval(startHVal, 0), startState, startNode)  # secondary comparision by state as required
         self.nodes[startState] = startNode
@@ -277,3 +277,10 @@ print(f"Expanded: {expanded}")
 print(f"Actions: {actions}")
 
 assert total_cost == 119.0, "Error in total cost returned"
+
+env = DragonBallEnv(MAPS["8x8"])
+wAgent = WeightedAStarAgent()
+actions, total_cost, expanded = wAgent.search(env, 0.5)
+print(f"Total_cost: {total_cost}")
+print(f"Expanded: {expanded}")
+print(f"Actions: {actions}")
