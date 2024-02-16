@@ -166,17 +166,27 @@ class AStarEpsilonAgent():
             finalState = self.nodes[finalState].papa
         actions.reverse()
         return actions
-    def calc_heuristic(self, state):
-        pass
     def calc_fval(self, hVal, gVal):
         return hVal + gVal
 
+    def initHeuristicCalc(self, env):
+        positionsForHueristic = {state[0] for state in env.goals}
+        positionsForHueristic.add(env.d1[0])
+        positionsForHueristic.add(env.d2[0])
+        self.pointsForHeuristic = {(position / 8, position % 8) for position in positionsForHueristic}
+
+    def calc_heuristic(self, state):
+        point = (state[0] / 8, state[0] % 8)
+        distances = {abs(point[0] - otherPoint[0]) + abs(point[1] - otherPoint[1]) for otherPoint in
+                     self.pointsForHeuristic}
+        return min(distances)
     def getNextToExpand(self, epsilon):
-        minFval = self.open.peekitem[1][0]
+        minFval = self.open.peekitem()[1][0]
         focal = heapdict((key, self.calc_heuristic(key)) for
                          key, (fval, state, node) in self.open.items() if fval < minFval * (1 + epsilon))
         return focal.peekitem()[0];
-def search(self, env: DragonBallEnv, epsilon: int) -> Tuple[List[int], float, int]:
+    def search(self, env: DragonBallEnv, epsilon: int) -> Tuple[List[int], float, int]:
+        self.initHeuristicCalc(env)
         env.reset()
         startState = env.get_state()
         startHVal = self.calc_heuristic(startState)
@@ -200,31 +210,31 @@ def search(self, env: DragonBallEnv, epsilon: int) -> Tuple[List[int], float, in
                 env.set_state(currentState)
                 childState, cost, terminated = env.step(action)
 
-                if (terminated and not env.is_final_state(childState)):
+                if terminated and not env.is_final_state(childState):
                     continue
 
                 newGVal = currentNode.totalCost + cost
                 childHVal = self.calc_heuristic(childState)
                 newFVal = self.calc_fval(childHVal, newGVal)
+                newChildNode = Node(childState, currentState, action, newGVal)
                 if (childState not in self.open) and (childState not in self.closed):
-                    self.open[childState] = (newFVal, childState, Node(childState, currentState, action, newGVal))
+                    self.open[childState] = (newFVal, childState, newChildNode)
+                    self.nodes[childState] = newChildNode
                 elif childState in self.open:
                     childExistingFVal, childState, childExistingNode = self.open[childState]
                     if newFVal < childExistingFVal:
-                        newChildNode = Node(childState, currentState, action, newGVal)
+                        self.nodes[childState] = newChildNode
                         self.open[childState] = (newFVal, childState, newChildNode)
                 else:
                     childExistingNode = self.nodes[childState]
                     childExistingFVal = self.calc_fval(childHVal, childExistingNode.totalCost)
                     if newFVal < childExistingFVal:
-                        newChildNode = Node(childState, currentState, action, newGVal)
                         self.open[childState] = (newFVal, childState, newChildNode)
+                        self.nodes[childState] = newChildNode
                         self.closed.remove(childState)
         return None
-    
-    
-    
-    
+
+
 ##### Testing area:
 import time
 from IPython.display import clear_output
@@ -293,6 +303,13 @@ assert total_cost == 119.0, "Error in total cost returned"
 env = DragonBallEnv(MAPS["8x8"])
 wAgent = WeightedAStarAgent()
 actions, total_cost, expanded = wAgent.search(env, 0.5)
+print(f"Total_cost: {total_cost}")
+print(f"Expanded: {expanded}")
+print(f"Actions: {actions}")
+
+env = DragonBallEnv(MAPS["8x8"])
+epAgent = AStarEpsilonAgent()
+actions, total_cost, expanded = epAgent.search(env, 6)
 print(f"Total_cost: {total_cost}")
 print(f"Expanded: {expanded}")
 print(f"Actions: {actions}")
