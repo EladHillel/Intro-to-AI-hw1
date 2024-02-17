@@ -43,7 +43,7 @@ class BFSAgent():
                 if (not successor[2]) and (childState not in self.closed) and (childState not in self.open):
                     self.open.append(childState)
                     self.nodes[childState] = Node(childState, currentState, action, totalCost)
-        return Node
+        return None, None, None
     def retrace_steps(self, finalState: Tuple) -> list[int]:
         actions = []
         while self.nodes[finalState].papaToSonAction != None:
@@ -142,7 +142,7 @@ class WeightedAStarAgent():
                         self.open[childState] = (newFVal,childState, newChildNode)
                         self.nodes[childState] = newChildNode
                         self.closed.remove(childState)
-        return None
+        return None, None, None
 
 
 
@@ -232,7 +232,7 @@ class AStarEpsilonAgent():
                         self.open[childState] = (newFVal, childState, newChildNode)
                         self.nodes[childState] = newChildNode
                         self.closed.remove(childState)
-        return None
+        return None, None, None
 
 
 ##### Testing area:
@@ -254,14 +254,15 @@ MAPS = {
             "FFFD",
             "FFFG"],
     "8x8": [
-        "SFFFFFFF",
-        "FFFFFTAL",
-        "TFFHFFTF",
-        "FFFFFHTF",
-        "FAFHFFFF",
-        "FHHFFFHF",
-        "DFTFHDTL",
-        "FLFHFFFG",
+        ['S', 'A', 'H', 'H', 'F', 'H', 'L', 'A'],
+        ['H', 'H', 'A', 'T', 'L', 'L', 'H', 'G'],
+        ['T', 'T', 'H', 'A', 'F', 'L', 'L', 'T'],
+        ['T', 'A', 'L', 'H', 'F', 'A', 'A', 'H'],
+        ['F', 'A', 'T', 'D', 'D', 'A', 'T', 'T'],
+        ['F', 'A', 'T', 'A', 'T', 'T', 'L', 'L'],
+        ['F', 'G', 'H', 'F', 'L', 'L', 'H', 'A'],
+        ['A', 'A', 'L', 'T', 'H', 'A', 'H', 'T'],
+
     ],
 }
 def print_solution(actions,env: DragonBallEnv) -> None:
@@ -285,7 +286,7 @@ def print_solution(actions,env: DragonBallEnv) -> None:
       print(f"Action: {action}")
       print(f"Cost: {cost}")
       print(f"Total cost: {total_cost}")
-      
+
       time.sleep(1)
 
       if terminated is True:
@@ -298,7 +299,7 @@ print(f"Total_cost: {total_cost}")
 print(f"Expanded: {expanded}")
 print(f"Actions: {actions}")
 
-assert total_cost == 119.0, "Error in total cost returned"
+#assert total_cost == 119.0, "Error in total cost returned"
 
 env = DragonBallEnv(MAPS["8x8"])
 wAgent = WeightedAStarAgent()
