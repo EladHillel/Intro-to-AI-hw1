@@ -194,7 +194,7 @@ class AStarEpsilonAgent():
         return min(distances)
     def getNextToExpand(self, epsilon):
         minFval = self.open.peekitem()[1][0]
-        focal = heapdict((key, self.calc_heuristic(key)) for
+        focal = heapdict((key, self.open[key][2].totalCost) for
                          key, (fval, state, node) in self.open.items() if fval < minFval * (1 + epsilon))
         return focal.peekitem()[0];
     def search(self, env: DragonBallEnv, epsilon: int) -> Tuple[List[int], float, int]:
