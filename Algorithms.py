@@ -38,6 +38,8 @@ class BFSAgent():
             self.expanded += 1
             self.closed.add(currentState)
             for action, successor in env.succ(currentState).items():
+                if successor[0] == None:
+                    break
                 env.reset()
                 env.set_state(currentState)
                 childState, cost, _ = env.step(action)
@@ -46,7 +48,7 @@ class BFSAgent():
                     steps = self.retrace_steps(currentState)
                     steps.append(action)
                     return (steps, totalCost, self.expanded)
-                if (not successor[2]) and (childState not in self.closed) and (childState not in self.open):
+                if (childState not in self.closed) and (childState not in self.open):
                     self.open.append(childState)
                     self.nodes[childState] = Node(childState, currentState, action, totalCost)
         return Node
@@ -115,7 +117,7 @@ class WeightedAStarAgent():
         env.reset()
         startState = env.get_state()
         startHVal = self.calc_heuristic(startState)
-        startNode = Node(startState, None, None, 0);
+        startNode = Node(startState, None, None, 0)
         self.open[startState] = (self.calc_fval(startHVal, 0), startState,  startNode) #secondary comparision by state as required
         self.nodes[startState] = startNode
 
@@ -196,7 +198,7 @@ class AStarEpsilonAgent():
         minFval = self.open.peekitem()[1][0]
         focal = heapdict((key, self.open[key][2].totalCost) for
                          key, (fval, state, node) in self.open.items() if fval < minFval * (1 + epsilon))
-        return focal.peekitem()[0];
+        return focal.peekitem()[0]
     def search(self, env: DragonBallEnv, epsilon: int) -> Tuple[List[int], float, int]:
         ## reset agent:
         self.open = heapdict() # key: state, value: (fValue, node)
@@ -208,7 +210,7 @@ class AStarEpsilonAgent():
         env.reset()
         startState = env.get_state()
         startHVal = self.calc_heuristic(startState)
-        startNode = Node(startState, None, None, 0);
+        startNode = Node(startState, None, None, 0)
         self.open[startState] = (
         self.calc_fval(startHVal, 0), startState, startNode)  # secondary comparision by state as required
         self.nodes[startState] = startNode
@@ -309,29 +311,29 @@ def print_solution(actions,env: DragonBallEnv) -> None:
       if terminated is True:
         break
     
-# env = DragonBallEnv(MAPS["8x8"])
-# BFS_agent = BFSAgent()
-# actions, total_cost, expanded = BFS_agent.search(env)
-# print(f"Total_cost: {total_cost}")
-# print(f"Expanded: {expanded}")
-# print(f"Actions: {actions}")
+env = DragonBallEnv(MAPS["8x8"])
+BFS_agent = BFSAgent()
+actions, total_cost, expanded = BFS_agent.search(env)
+print(f"Total_cost: {total_cost}")
+print(f"Expanded: {expanded}")
+print(f"Actions: {actions}")
 
-# assert total_cost == 119.0, "Error in total cost returned"
+assert total_cost == 119.0, "Error in total cost returned"
 
-# env = DragonBallEnv(MAPS["8x8"])
-# wAgent = WeightedAStarAgent()
-# actions, total_cost, expanded = wAgent.search(env, 0.5)
-# print(f"Total_cost: {total_cost}")
-# print(f"Expanded: {expanded}")
-# print(f"Actions: {actions}")
+env = DragonBallEnv(MAPS["8x8"])
+wAgent = WeightedAStarAgent()
+actions, total_cost, expanded = wAgent.search(env, 0.5)
+print(f"Total_cost: {total_cost}")
+print(f"Expanded: {expanded}")
+print(f"Actions: {actions}")
 
-# env = DragonBallEnv(MAPS["8x8"])
-# epAgent = AStarEpsilonAgent()
-# actions, total_cost, expanded = epAgent.search(env, 6)
-# print(f"Total_cost: {total_cost}")
-# print(f"Expanded: {expanded}")
-# print(f"Actions: {actions}")
-
+env = DragonBallEnv(MAPS["8x8"])
+epAgent = AStarEpsilonAgent()
+actions, total_cost, expanded = epAgent.search(env, 6)
+print(f"Total_cost: {total_cost}")
+print(f"Expanded: {expanded}")
+print(f"Actions: {actions}")
+"""
 import csv
 
 test_boards = {
@@ -416,3 +418,4 @@ with open("results.csv", 'w') as f:
         data += [total_cost, expanded]
 
     writer.writerow(data)
+"""
