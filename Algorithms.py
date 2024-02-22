@@ -37,6 +37,8 @@ class BFSAgent():
             currentState = self.open.popleft()
             self.expanded += 1
             self.closed.add(currentState)
+            if currentState[0] in [goal[0] for goal in env.get_goal_states()]:
+                continue
             for action, successor in env.succ(currentState).items():
                 if successor[0] == None:
                     break
