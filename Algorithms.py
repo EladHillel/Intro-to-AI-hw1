@@ -91,12 +91,15 @@ class WeightedAStarAgent():
         actions.reverse()
         return actions
 
-    def initHeuristicCalc(self, env):
-        positionsForHueristic = {state[0] for state in env.goals}
-        positionsForHueristic.add(env.d1[0])
-        positionsForHueristic.add(env.d2[0])
+    def initHeuristicCalc(self, env, state):
+        positionsForHueristic = {goal[0] for goal in env.goals}
+        if not state[1]:
+            positionsForHueristic.add(env.d1[0])
+        if not state[2]:
+            positionsForHueristic.add(env.d2[0])
         self.pointsForHeuristic = {(position / 8, position % 8) for position in positionsForHueristic}
-    def calc_heuristic(self, state):
+    def calc_heuristic(self,env , state):
+        self.initHeuristicCalc(env, state)
         point = (state[0] / 8, state[0] % 8)
         distances = {abs(point[0] - otherPoint[0]) + abs(point[1] - otherPoint[1]) for otherPoint in self.pointsForHeuristic }
         return min(distances)
@@ -113,10 +116,9 @@ class WeightedAStarAgent():
         self.expanded = 0
         ##
         self.weight = h_weight
-        self.initHeuristicCalc(env)
         env.reset()
         startState = env.get_state()
-        startHVal = self.calc_heuristic(startState)
+        startHVal = self.calc_heuristic(env, startState)
         startNode = Node(startState, None, None, 0)
         self.open[startState] = (self.calc_fval(startHVal, 0), startState,  startNode) #secondary comparision by state as required
         self.nodes[startState] = startNode
@@ -138,7 +140,7 @@ class WeightedAStarAgent():
                     continue
 
                 newGVal = currentNode.totalCost + cost
-                childHVal = self.calc_heuristic(childState)
+                childHVal = self.calc_heuristic(env,childState)
                 newFVal = self.calc_fval(childHVal, newGVal)
                 newChildNode = Node(childState, currentState, action, newGVal)
                 if (childState not in self.open) and (childState not in self.closed):
@@ -183,13 +185,16 @@ class AStarEpsilonAgent():
     def calc_fval(self, hVal, gVal):
         return hVal + gVal
 
-    def initHeuristicCalc(self, env):
-        positionsForHueristic = {state[0] for state in env.goals}
-        positionsForHueristic.add(env.d1[0])
-        positionsForHueristic.add(env.d2[0])
+    def initHeuristicCalc(self, env, state):
+        positionsForHueristic = {goal[0] for goal in env.goals}
+        if not state[1]:
+            positionsForHueristic.add(env.d1[0])
+        if not state[2]:
+            positionsForHueristic.add(env.d2[0])
         self.pointsForHeuristic = {(position / 8, position % 8) for position in positionsForHueristic}
 
-    def calc_heuristic(self, state):
+    def calc_heuristic(self, env, state):
+        self.initHeuristicCalc(env, state)
         point = (state[0] / 8, state[0] % 8)
         distances = {abs(point[0] - otherPoint[0]) + abs(point[1] - otherPoint[1]) for otherPoint in
                      self.pointsForHeuristic}
@@ -206,10 +211,9 @@ class AStarEpsilonAgent():
         self.nodes = dict() # state: Node(state, prevState, action)
         self.expanded = 0
         ##
-        self.initHeuristicCalc(env)
         env.reset()
         startState = env.get_state()
-        startHVal = self.calc_heuristic(startState)
+        startHVal = self.calc_heuristic(env, startState)
         startNode = Node(startState, None, None, 0)
         self.open[startState] = (
         self.calc_fval(startHVal, 0), startState, startNode)  # secondary comparision by state as required
@@ -234,7 +238,7 @@ class AStarEpsilonAgent():
                     continue
 
                 newGVal = currentNode.totalCost + cost
-                childHVal = self.calc_heuristic(childState)
+                childHVal = self.calc_heuristic(env, childState)
                 newFVal = self.calc_fval(childHVal, newGVal)
                 newChildNode = Node(childState, currentState, action, newGVal)
                 if (childState not in self.open) and (childState not in self.closed):
