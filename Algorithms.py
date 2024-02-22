@@ -53,7 +53,7 @@ class BFSAgent():
                 if (childState not in self.closed) and (childState not in self.open):
                     self.open.append(childState)
                     self.nodes[childState] = Node(childState, currentState, action, totalCost)
-        return Node
+        return None, None, None
     def retrace_steps(self, finalState: Tuple) -> list[int]:
         actions = []
         while self.nodes[finalState].papaToSonAction != None:
@@ -160,7 +160,7 @@ class WeightedAStarAgent():
                         self.open[childState] = (newFVal,childState, newChildNode)
                         self.nodes[childState] = newChildNode
                         self.closed.remove(childState)
-        return None
+        return None, None, None
 
 
 
@@ -258,7 +258,7 @@ class AStarEpsilonAgent():
                         self.open[childState] = (newFVal, childState, newChildNode)
                         self.nodes[childState] = newChildNode
                         self.closed.remove(childState)
-        return None
+        return None, None, None
 
 
 ##### Testing area:
