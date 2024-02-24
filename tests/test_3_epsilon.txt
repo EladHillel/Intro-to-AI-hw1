@@ -1,0 +1,4 @@
+PARAM: 7
+Total_cost: None
+Expanded: None
+Actions: None

@@ -1,0 +1,4 @@
+PARAM: 6
+Total_cost: 37.0
+Expanded: 61
+Actions: [1, 0, 0, 1, 0, 0, 0, 0, 3, 3, 2, 2]
