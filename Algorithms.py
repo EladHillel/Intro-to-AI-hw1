@@ -99,15 +99,17 @@ class WeightedAStarAgent():
             positionsForHueristic.add(env.d1[0])
         if not state[2]:
             positionsForHueristic.add(env.d2[0])
-        self.pointsForHeuristic = {(position / 8, position % 8) for position in positionsForHueristic}
-    def calc_heuristic(self,env , state):
+        self.pointsForHeuristic = {(position // env.ncol, position % env.ncol) for position in positionsForHueristic}
+
+    def calc_heuristic(self, env, state):
         self.initHeuristicCalc(env, state)
-        point = (state[0] / 8, state[0] % 8)
-        distances = {abs(point[0] - otherPoint[0]) + abs(point[1] - otherPoint[1]) for otherPoint in self.pointsForHeuristic }
+        point = (state[0] // env.ncol, state[0] % env.ncol)
+        distances = {abs(point[0] - otherPoint[0]) + abs(point[1] - otherPoint[1]) for otherPoint in
+                     self.pointsForHeuristic}
         return min(distances)
 
     def calc_fval(self, hVal, gVal):
-        return self.weight * hVal + (1-self.weight) * gVal
+        return 1.0 * (self.weight * hVal + (1.0 - self.weight) * gVal)
 
 
     def search(self, env: DragonBallEnv, h_weight) -> Tuple[List[int], float, int]:
@@ -193,11 +195,11 @@ class AStarEpsilonAgent():
             positionsForHueristic.add(env.d1[0])
         if not state[2]:
             positionsForHueristic.add(env.d2[0])
-        self.pointsForHeuristic = {(position / 8, position % 8) for position in positionsForHueristic}
+        self.pointsForHeuristic = {(position // env.ncol, position % env.ncol) for position in positionsForHueristic}
 
     def calc_heuristic(self, env, state):
         self.initHeuristicCalc(env, state)
-        point = (state[0] / 8, state[0] % 8)
+        point = (state[0] // env.ncol, state[0] % env.ncol)
         distances = {abs(point[0] - otherPoint[0]) + abs(point[1] - otherPoint[1]) for otherPoint in
                      self.pointsForHeuristic}
         return min(distances)
@@ -289,6 +291,27 @@ MAPS = {
         "DFTFHDTL",
         "FLFHFFFG",
     ],
+"map20x20" :
+['SFFLHFHTALHLFATAHTHT',
+'HFTTLLAHFTAFAAHHTLFH',
+'HHTFFFHAFFFFAFFTHHHT',
+'TTAFHTFHTHHLAHHAALLF',
+'HLALHFFTHAHHAFFLFHTF',
+'AFTAFTFLFTTTFTLLTHDF',
+'LFHFFAAHFLHAHHFHFALA',
+'AFTFFLTFLFTAFFLTFAHH',
+'HTTLFTHLTFAFFLAFHFTF',
+'LLALFHFAHFAALHFTFHTF',
+'LFFFAAFLFFFFHFLFFAFH',
+'THHTTFAFLATFATFTHLLL',
+'HHHAFFFATLLALFAHTHLL',
+'HLFFFFHFFLAAFTFFDAFH',
+'HTLFTHFFLTHLHHLHFTFH',
+'AFTTLHLFFLHTFFAHLAFT',
+'HAATLHFFFHHHHAFFFHLH',
+'FHFLLLFHLFFLFTFFHAFL',
+'LHTFLTLTFATFAFAFHAAF',
+'FTFFFFFLFTHFTFLTLHFG']
 }
 def print_solution(actions,env: DragonBallEnv) -> None:
     env.reset()
@@ -317,28 +340,22 @@ def print_solution(actions,env: DragonBallEnv) -> None:
       if terminated is True:
         break
     
-env = DragonBallEnv(MAPS["8x8"])
-BFS_agent = BFSAgent()
-actions, total_cost, expanded = BFS_agent.search(env)
-print(f"Total_cost: {total_cost}")
-print(f"Expanded: {expanded}")
-print(f"Actions: {actions}")
 
-assert total_cost == 119.0, "Error in total cost returned"
-
-env = DragonBallEnv(MAPS["8x8"])
+env = DragonBallEnv(MAPS["map20x20"])
 wAgent = WeightedAStarAgent()
 actions, total_cost, expanded = wAgent.search(env, 0.5)
 print(f"Total_cost: {total_cost}")
 print(f"Expanded: {expanded}")
 print(f"Actions: {actions}")
 
-env = DragonBallEnv(MAPS["8x8"])
-epAgent = AStarEpsilonAgent()
-actions, total_cost, expanded = epAgent.search(env, 6)
+env = DragonBallEnv(MAPS["map20x20"])
+wAgent = WeightedAStarAgent()
+actions, total_cost, expanded = wAgent.search(env, 1)
 print(f"Total_cost: {total_cost}")
 print(f"Expanded: {expanded}")
 print(f"Actions: {actions}")
+
+
 """
 import csv
 
